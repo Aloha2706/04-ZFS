@@ -34,36 +34,77 @@
     NAME             USED  AVAIL  REFER  MOUNTPOINT
     otus1           24.1M   344M  21.5M  /otus1
     otus2           17.7M   350M  17.6M  /otus2
-    #### otus3           10.8M   357M  10.7M  /otus3
+    otus3           10.8M   357M  10.7M  /otus3
     otus4           39.1M   329M  39.1M  /otus4
 
-Вывод команды:
 
-    NAME    SIZE  ALLOC   FREE  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
-    otus1   496M  24.1M   472M         -     4%     4%  1.00x  ONLINE  -
-    otus2   496M  17.7M   478M         -     4%     3%  1.00x  ONLINE  -
-    otus3   496M  10.8M   485M         -     1%     2%  1.00x  ONLINE  -
-    otus4   496M  39.2M   457M         -     5%     7%  1.00x  ONLINE  -
+    zfs get all | grep compressratio | grep -v ref
 
+    otus1              compressratio         1.78x                  -
+    otus2              compressratio         2.22x                  -
+    otus3              compressratio         3.64x                  -
+    otus4              compressratio         1.00x                  -
 
+Получается что алгоритм gzip-9 самый эффективный по сжатию.
 
+##  2. Определение настроек пула
 
+Скачиваем архив в домашний каталог:
+    wget -O archive.tar.gz --no-check-certificate 'https://drive.google.com/open?id=1KRBNW33QWqbvbVHa3hLJivOAt60yukkg&xport=download'
 
+Разархивируем его:
+    tar -xzvf archive.tar.gz
 
+попытка импортировать пулл провалилась из за несовпадения версий, поэтому импортируем только в readonly режиме:
 
-и дописать в Vagrant файл:
+    zpool import otus -o readonly=on -d /root/zpoolexport/
 
-    #текст выделенный строками 
+    [root@lvm ~]# zpool status otus
+      pool: otus
+    state: ONLINE
+      scan: none requested
+    config:
 
-вдало
-# одна решетка 
-##  Две решетки 
-### три решетки
+            NAME                         STATE     READ WRITE CKSUM
+            otus                         ONLINE       0     0     0
+              mirror-0                   ONLINE       0     0     0
+                /root/zpoolexport/filea  ONLINE       0     0     0
+                /root/zpoolexport/fileb  ONLINE       0     0     0
+    errors: No known data errors
+Запрос сразу всех параметром файловой системы или на выбор : 
+    zfs get all otus
+    zfs get available otus
+    zfs get readonly otus
+    zfs get recordsize otus
+    zfs get compression otus
+    zfs get checksum otus
 
+### 3. Работа со снапшотом, поиск сообщения от преподавателя
 
-    hkhkhjkhkjk
+скачиваем файл 
 
-jhgjhgkjhgkjhgkhj
+     wget -O otus_task2.file --no-check-certificate https://drive.google.com/u/0/uc?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG
 
+ Попытка восстановить в пул otus провалилась так как он только для чтения 
+ zfs receive otus/test@today < otus_task2.file
+импортируем в другой пул 
+cat otus_task2.file | sudo zfs recv pool1/task3
+
+    zfs list
+    NAME             USED  AVAIL  REFER  MOUNTPOINT
+    otus            2.03M   350M    24K  /otus
+    otus/hometask2  1.88M   350M  1.88M  /otus/hometask2
+    otus1           24.1M   344M  21.5M  /otus1
+    otus1/task3     2.46M   344M  2.44M  /otus1/task3
+    otus2           17.7M   350M  17.6M  /otus2
+    otus3           10.8M   357M  10.7M  /otus3
+    otus4           39.1M   329M  39.1M  /otus4
+
+Ищем файл в каталоге и читаем его:
+
+    find /otus1/task3 -name "secret_message"
+    /otus1/task3/task1/file_mess/secret_message
+    cat /otus1/task3/task1/file_mess/secret_message
+    https://github.com/sindresorhus/awesome
 
 
