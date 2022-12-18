@@ -72,6 +72,7 @@
                 /root/zpoolexport/fileb  ONLINE       0     0     0
     errors: No known data errors
 Запрос сразу всех параметром файловой системы или на выбор : 
+
     zfs get all otus
     zfs get available otus
     zfs get readonly otus
@@ -86,9 +87,15 @@
      wget -O otus_task2.file --no-check-certificate https://drive.google.com/u/0/uc?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG
 
  Попытка восстановить в пул otus провалилась так как он только для чтения 
- zfs receive otus/test@today < otus_task2.file
+
+
+    zfs receive otus/test@today < otus_task2.file
+
+
 импортируем в другой пул 
-cat otus_task2.file | sudo zfs recv pool1/task3
+
+
+    cat otus_task2.file | sudo zfs recv pool1/task3
 
     zfs list
     NAME             USED  AVAIL  REFER  MOUNTPOINT
