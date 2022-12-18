@@ -16,6 +16,27 @@
 
     zpool list
 
+Добавим разные алгоритмы сжатия в каждую файловую систему:
+
+    zfs set compression=lzjb otus1
+    zfs set compression=lz4 otus2
+    zfs set compression=gzip-9 otus3
+    zfs set compression=zle otus4
+
+Скачаем один и тот же текстовый файл во все пулы:
+
+     for i in {1..4}; do wget -P /otus$ihttps://gutenberg.org/cache/epub/2600/pg2600.converter.log; done
+
+проверим степень сжатия файлов:
+
+    zfs list
+
+    NAME             USED  AVAIL  REFER  MOUNTPOINT
+    otus1           24.1M   344M  21.5M  /otus1
+    otus2           17.7M   350M  17.6M  /otus2
+    ####otus3           10.8M   357M  10.7M  /otus3
+    otus4           39.1M   329M  39.1M  /otus4
+
 Вывод команды:
 
     NAME    SIZE  ALLOC   FREE  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
